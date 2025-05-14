@@ -1,0 +1,13 @@
+flutter_native_splash:
+  android: true
+  ios: false
+  web: false 
+  image: "lib/images/21.png"
+
+  color: "#FFFACD"
+
+  android_12:
+    color: "#FFFACD"
+    image: "lib/images/21.png"
+    branding: "lib/images/01.png"
+    branding_mode: scale
