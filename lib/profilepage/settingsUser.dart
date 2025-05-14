@@ -47,7 +47,11 @@ class Settings extends StatelessWidget {
           title: "Log Out",
           onTap: () {
             // Handle logout tap
-            Navigator.pushReplacementNamed(context, '/loginpage');
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/loginpage',
+              (Route<dynamic> route) => false,
+            );
           },
         ),
       ],

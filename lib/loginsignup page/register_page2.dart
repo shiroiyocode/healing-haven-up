@@ -79,7 +79,11 @@ class _RegisterPage2State extends State<RegisterPage2> {
                 SizedBox(height: 80),
                 Mybutton(
                   onTap: () {
-                    Navigator.pushReplacementNamed(context, '/homepageUser');
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/homepageUser',
+                      (Route<dynamic> route) => false,
+                    );
                   },
                   buttonTxt: "Create Account",
                   color: Colors.brown.shade100,

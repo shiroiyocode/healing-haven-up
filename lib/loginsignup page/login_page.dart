@@ -59,9 +59,10 @@ class LoginPage extends StatelessWidget {
                           builder:
                               (context) => ForgotPasswordPage(
                                 onBackToLogin: () {
-                                  Navigator.pushReplacementNamed(
+                                  Navigator.pushNamedAndRemoveUntil(
                                     context,
                                     '/loginpage',
+                                    (Route<dynamic> route) => false,
                                   ); // Or use pushReplacementNamed for safety
                                 },
                               ),

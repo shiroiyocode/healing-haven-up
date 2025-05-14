@@ -81,7 +81,11 @@ class LoginPageDoctor extends StatelessWidget {
                 Mybutton(
                   txtColor: Colors.brown.shade900,
                   onTap: () {
-                    Navigator.pushReplacementNamed(context, '/doctorhomepage');
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/doctorhomepage',
+                      (Route<dynamic> route) => false,
+                    );
                   },
                   buttonTxt: "Sign In",
                   color: Colors.brown.shade100,

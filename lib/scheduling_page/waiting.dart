@@ -65,6 +65,7 @@ class _WaitingPageState extends State<WaitingPage> {
               SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () {
+                  Navigator.pop(context);
                   Navigator.pushReplacementNamed(context, '/homepageUser');
                 },
                 icon: Icon(Icons.home),

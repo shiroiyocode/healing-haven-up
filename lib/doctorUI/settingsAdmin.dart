@@ -45,7 +45,11 @@ class SettingsAdmin extends StatelessWidget {
           icon: Icons.logout,
           title: "Log Out",
           onTap: () {
-            Navigator.pushReplacementNamed(context, '/loginpage');
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/loginpage',
+              (Route<dynamic> route) => false,
+            );
           },
         ),
       ],

@@ -83,6 +83,7 @@ class _SchedulingPageState extends State<SchedulingPage> {
                   // Handle confirmation action here
                   Navigator.pop(context); // Close the dialog
                   // You can perform further actions for confirmation
+                  Navigator.pop(context);
                   Navigator.pushNamed(context, '/waitingpage');
                 },
                 child: Text(

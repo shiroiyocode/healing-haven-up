@@ -61,7 +61,11 @@ class SuperAdminHomePage extends StatelessWidget {
                       color: Colors.brown[800]!,
                       onTap: () {
                         // You can replace this with your logout logic
-                        Navigator.pushReplacementNamed(context, '/loginpage');
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/loginpage',
+                          (Route<dynamic> route) => false,
+                        );
                       },
                     ),
                   ],

@@ -52,7 +52,11 @@ class LoginPageSuperAdmin extends StatelessWidget {
                 Mybutton(
                   txtColor: Colors.brown.shade900,
                   onTap: () {
-                    Navigator.pushReplacementNamed(context, '/superadminpage');
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/superadminpage',
+                      (Route<dynamic> route) => false,
+                    );
                   },
                   buttonTxt: "Sign In",
                   color: Colors.brown.shade100,

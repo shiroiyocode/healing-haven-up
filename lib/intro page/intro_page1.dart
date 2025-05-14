@@ -32,7 +32,11 @@ class IntroPage3 extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/loginpage');
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/loginpage',
+                  (Route<dynamic> route) => false,
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.all(18.0),
