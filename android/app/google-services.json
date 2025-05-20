@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "292002462997",
+    "project_id": "healinghaven-108d9",
+    "storage_bucket": "healinghaven-108d9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292002462997:android:5ec9295a63c5a6e9c3bd1c",
+        "android_client_info": {
+          "package_name": "com.example.healing_haven"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292002462997-3tov5bi9fo71uue4mmrcoq3c72el1clo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.healing_haven",
+            "certificate_hash": "6a03eab501fcc53cb2a53bb714284c813c84a49f"
+          }
+        },
+        {
+          "client_id": "292002462997-ujcr4gtbo0m4t5p0ssj79lv81ffme2cj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMdF_KBee1sVqJ-4wxpJCqMaL3bv32u-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "292002462997-ujcr4gtbo0m4t5p0ssj79lv81ffme2cj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "292002462997-of916dhlbh4r3o95amj04cbfq0dgo58s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.healingHaven"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -28,7 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
     if (picked != null) {
       setState(() {
-        dateController.text = picked.toString().split(" ")[0];
+        dateController.text = picked.toIso8601String().split("T")[0];
       });
     }
   }
@@ -40,11 +40,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _handleNext() {
     if (_formKey.currentState!.validate()) {
-      // Full phone number already stored in numberController
       String fullPhoneNumber = numberController.text.trim();
-      print("Full Phone Number: $fullPhoneNumber");
 
-      Navigator.pushNamed(context, '/registerpage2');
+      // Debug output for phone number with country code prefix
+      if (!fullPhoneNumber.startsWith('+')) {
+        fullPhoneNumber = '+63' + fullPhoneNumber; // fallback prefix if missing
+      }
+      print("Full Phone Number: $fullPhoneNumber");
+      print("Email: ${emailController.text.trim()}");
+
+      Navigator.pushNamed(
+        context,
+        '/registerpage2',
+        arguments: emailController.text.trim(),
+      );
     }
   }
 

@@ -17,6 +17,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceOrientation = MediaQuery.of(context).orientation;
     return Scaffold(
       body: Stack(
         children: [
@@ -28,22 +29,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               IntroPage3(controller: _controller),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0, bottom: 40),
-            child: Container(
-              alignment: Alignment(-0.7, 0.1),
-              child: SmoothPageIndicator(
-                controller: _controller,
-                count: 3,
-                effect: ExpandingDotsEffect(
-                  activeDotColor: Colors.white,
-                  dotHeight: 14,
-                  dotWidth: 18,
-                  radius: 20,
+          if (deviceOrientation == Orientation.portrait)
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0, bottom: 40),
+              child: Container(
+                alignment: Alignment(-0.7, 0.1),
+                child: SmoothPageIndicator(
+                  controller: _controller,
+                  count: 3,
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: Colors.white,
+                    dotHeight: 14,
+                    dotWidth: 18,
+                    radius: 20,
+                  ),
                 ),
               ),
             ),
-          ),
+          if (deviceOrientation == Orientation.landscape)
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0, bottom: 40),
+              child: Container(
+                alignment: Alignment(0.25, -1),
+                child: SmoothPageIndicator(
+                  controller: _controller,
+                  count: 3,
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: Colors.white,
+                    dotHeight: 14,
+                    dotWidth: 18,
+                    radius: 20,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

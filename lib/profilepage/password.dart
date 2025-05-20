@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healing_haven/auth_service.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -27,37 +28,37 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   String? _validateConfirmPassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please confirm your password';
+    }
     if (value != _newPasswordController.text) {
       return 'Passwords do not match';
     }
     return null;
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text("Confirm"),
-              content: const Text(
-                "Are you sure you want to change your password?",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showSuccessDialog();
-                  },
-                  child: const Text("Yes"),
-                ),
-              ],
-            ),
-      );
+      String oldPassword = _oldPasswordController.text;
+      String newPassword = _newPasswordController.text;
+
+      try {
+        await authServ.value.resetPasswordCurrentPassword(
+          currentPassword: oldPassword,
+          newPassword: newPassword,
+          email:
+              authServ
+                  .value
+                  .currentUser!
+                  .email!, // Ensure currentUser  is not null
+        );
+
+        // Show success message if password is changed
+        _showSuccessDialog();
+      } catch (e) {
+        // Show error message if password change fails
+        _showErrorDialog(e.toString());
+      }
     }
   }
 
@@ -81,6 +82,42 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text(
                   'Back',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.grey.shade300,
+            icon: const Icon(
+              Icons.cancel,
+              size: 100,
+              color:
+                  Colors.red, // Use Colors.red instead of Colors.red.shade700
+            ),
+            content: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: const Text(
+                  'OK',
                   style: TextStyle(color: Colors.grey, fontSize: 16),
                 ),
               ),
@@ -145,7 +182,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
               const SizedBox(height: 16),
 
-              // Button
+              // Change Password Button
               ElevatedButton(
                 onPressed: _submit,
                 style: ElevatedButton.styleFrom(
