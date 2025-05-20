@@ -29,18 +29,15 @@ class _LoginPageState extends State<LoginPage> {
     return passwordRegex.hasMatch(password);
   }
 
-  // Handle login logic
   void _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      // Get the email and password from the controllers
+    if (_formKey.currentState?.validate() ?? false) {
       String email = usernameController.text.trim();
       String password = passwordController.text.trim();
 
       try {
         await authServ.value.signIn(email: email, password: password);
-        Navigator.pushReplacementNamed(context, '/homepageUser ');
+        Navigator.pushReplacementNamed(context, '/homepageUser');
       } catch (e) {
-        // Show an error message if login fails
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login failed: ${e.toString()}')),
         );
@@ -192,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                             await authServ.value.signInWithGoogle();
                             Navigator.pushReplacementNamed(
                               context,
-                              '/homepageUser ',
+                              '/homepageUser',
                             );
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
