@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
 import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -39,10 +40,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _handleNext() {
     if (_formKey.currentState!.validate()) {
-      // Prepare full phone number with +63 prefix
-      String fullPhoneNumber = '+63' + numberController.text.trim();
-
-      // You can use fullPhoneNumber as needed here or pass it to next page
+      // Full phone number already stored in numberController
+      String fullPhoneNumber = numberController.text.trim();
       print("Full Phone Number: $fullPhoneNumber");
 
       Navigator.pushNamed(context, '/registerpage2');
@@ -146,17 +145,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: TextFormField(
-                      controller: numberController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 10,
+                    child: IntlPhoneField(
                       decoration: InputDecoration(
                         fillColor: Colors.brown.shade100,
-                        hintText: "Phone Number",
                         filled: true,
-                        prefixText: '+63 ',
-                        prefixStyle: const TextStyle(color: Colors.grey),
-                        counterText: '', // hides length counter
+                        hintText: 'Phone Number',
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.brown.shade200),
                         ),
@@ -164,15 +157,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderSide: BorderSide(color: Colors.white),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
+                      initialCountryCode: 'PH',
+                      onChanged: (phone) {
+                        numberController.text = phone.completeNumber;
+                      },
+                      validator: (phone) {
+                        if (phone == null || phone.number.trim().isEmpty) {
                           return 'Please enter your phone number';
-                        }
-                        if (value.length != 10) {
-                          return 'Phone number must be 10 digits';
-                        }
-                        if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-                          return 'Phone number must contain only digits';
                         }
                         return null;
                       },

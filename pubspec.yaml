@@ -41,6 +41,7 @@ dependencies:
   google_nav_bar: ^5.0.7
   provider:
   lottie: ^3.3.1
+  intl_phone_field: ^3.2.0
   
 
 dev_dependencies:

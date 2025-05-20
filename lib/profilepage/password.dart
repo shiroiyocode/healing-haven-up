@@ -8,191 +8,163 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  // Validators
+  String? _validatePassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'This field cannot be empty';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value != _newPasswordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Confirm"),
+              content: const Text(
+                "Are you sure you want to change your password?",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showSuccessDialog();
+                  },
+                  child: const Text("Yes"),
+                ),
+              ],
+            ),
+      );
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.grey.shade200,
+            title: const Text(
+              "Password Changed",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            icon: const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.green,
+              size: 100,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Back',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  InputDecoration _buildDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.brown.shade800, width: 2),
+      ),
+      hintText: 'Enter your $label',
+      prefixIcon: const Icon(Icons.lock),
+      filled: true,
+      fillColor: Colors.grey[100],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown.shade100,
       appBar: AppBar(
-        title: Text('Change Password'),
+        title: const Text('Change Password'),
         backgroundColor: Colors.brown.shade100,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            // Old Password Field
-            TextField(
-              controller: _oldPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Old Password',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.brown.shade800,
-                    width: 2,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              // Old Password
+              TextFormField(
+                controller: _oldPasswordController,
+                obscureText: true,
+                decoration: _buildDecoration('Old Password'),
+                validator: _validatePassword,
+              ),
+              const SizedBox(height: 16),
+
+              // New Password
+              TextFormField(
+                controller: _newPasswordController,
+                obscureText: true,
+                decoration: _buildDecoration('New Password'),
+                validator: _validatePassword,
+              ),
+              const SizedBox(height: 16),
+
+              // Confirm Password
+              TextFormField(
+                controller: _confirmPasswordController,
+                obscureText: true,
+                decoration: _buildDecoration('Confirm Password'),
+                validator: _validateConfirmPassword,
+              ),
+              const SizedBox(height: 16),
+
+              // Button
+              ElevatedButton(
+                onPressed: _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown.shade800,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 32,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-
-                hintText: 'Enter your old password',
-                prefixIcon: Icon(Icons.lock),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
-
-            SizedBox(height: 16),
-
-            // New Password Field
-            TextField(
-              controller: _newPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'New Password',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.brown.shade800,
-                    width: 2,
-                  ),
-                ),
-
-                hintText: 'Enter your new password',
-                prefixIcon: Icon(Icons.lock),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Confirm New Password Field
-            TextField(
-              controller: _confirmPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.brown.shade800,
-                    width: 2,
-                  ),
-                ),
-
-                hintText: 'Re-enter your new password',
-                prefixIcon: Icon(Icons.lock),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Change Password Button
-            ElevatedButton(
-              onPressed: () {
-                // Handle password change logic here
-                String oldPassword = _oldPasswordController.text;
-                String newPassword = _newPasswordController.text;
-                String confirmPassword = _confirmPasswordController.text;
-
-                if (newPassword == confirmPassword) {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          backgroundColor: Colors.grey.shade200,
-                          title: Text(
-                            "Password Changed",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          icon: Icon(
-                            Icons.check_circle_rounded,
-                            color: Colors.green,
-                            size: 100,
-                          ),
-                          actions: [
-                            // Cancel button
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              child: Text(
-                                'Back',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                  );
-                } else {
-                  // Show error if passwords don't match
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          backgroundColor: Colors.grey.shade300,
-                          icon: Icon(
-                            Icons.cancel,
-                            size: 100,
-                            color: Colors.redAccent.shade700,
-                          ),
-                          content: Text(
-                            'Passwords do not match.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                'OK',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.brown.shade800, // Set background color
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                child: const Text(
+                  'Change Password',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
-              child: Text(
-                'Change Password',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ), // Text color
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

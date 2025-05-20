@@ -40,7 +40,6 @@ class _ServicesPageState extends State<ServicesPage> {
       ),
       body: Column(
         children: [
-          // Tab bar
           Container(
             color: Colors.grey[300],
             child: Row(
@@ -59,8 +58,6 @@ class _ServicesPageState extends State<ServicesPage> {
               ],
             ),
           ),
-
-          // PageView
           Expanded(
             child: PageView(
               controller: _pageController,
@@ -116,22 +113,43 @@ class _ConsultationsPage extends StatelessWidget {
       'title': 'Consultation for Kenneth Reyes',
       'date': 'April 21, 2025',
       'status': 'Pending',
+      'name': 'Kenneth Reyes',
+      'age': 28,
+      'reason': 'Hair loss treatment',
     },
     {
       'title': 'Consultation for Kenneth Reyes',
       'date': 'April 23, 2025',
       'status': 'Approved',
+      'name': 'Kenneth Reyes',
+      'age': 28,
+      'reason': 'Skin allergy diagnosis',
     },
     {
       'title': 'Consultation for Kenneth Reyes',
       'date': 'April 25, 2025',
       'status': 'Declined',
+      'name': 'Kenneth Reyes',
+      'age': 28,
+      'reason': 'Wound care follow-up',
     },
   ];
 
   final List<Map<String, dynamic>> pastConsultations = [
-    {'title': 'Consultation with Dr. Wong', 'date': 'March 14, 2025'},
-    {'title': 'Consultation with Dr. Wong', 'date': 'February 20, 2025'},
+    {
+      'title': 'Consultation with Dr. Wong',
+      'date': 'March 14, 2025',
+      'name': 'Kenneth Reyes',
+      'age': 28,
+      'reason': 'Routine follow-up',
+    },
+    {
+      'title': 'Consultation with Dr. Wong',
+      'date': 'February 20, 2025',
+      'name': 'Kenneth Reyes',
+      'age': 28,
+      'reason': 'Initial assessment',
+    },
   ];
 
   Color _getStatusColor(String status) {
@@ -153,7 +171,6 @@ class _ConsultationsPage extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          // Upcoming
           Text(
             "Upcoming Consultations",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -162,7 +179,11 @@ class _ConsultationsPage extends StatelessWidget {
           ...upcomingConsultations.map((consultation) {
             return Card(
               margin: EdgeInsets.only(bottom: 12),
-              child: ListTile(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ExpansionTile(
                 leading: Icon(Icons.schedule, color: Colors.brown),
                 title: Text(consultation['title']),
                 subtitle: Text("Date: ${consultation['date']}"),
@@ -171,7 +192,7 @@ class _ConsultationsPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: _getStatusColor(
                       consultation['status'],
-                    ).withValues(alpha: 0.2),
+                    ).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -182,12 +203,35 @@ class _ConsultationsPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Name: ${consultation['name']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          "Age: ${consultation['age']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          "Reason: ${consultation['reason']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           }).toList(),
-
           SizedBox(height: 20),
-          // Past
           Text(
             "Past Consultations",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -196,11 +240,40 @@ class _ConsultationsPage extends StatelessWidget {
           ...pastConsultations.map((consultation) {
             return Card(
               margin: EdgeInsets.only(bottom: 12),
-              child: ListTile(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ExpansionTile(
                 leading: Icon(Icons.history, color: Colors.brown),
                 title: Text(consultation['title']),
                 subtitle: Text("Date: ${consultation['date']}"),
-                trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                trailing: Icon(Icons.arrow_drop_down),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Name: ${consultation['name']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          "Age: ${consultation['age']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          "Reason: ${consultation['reason']}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           }).toList(),
@@ -258,7 +331,7 @@ class _AvailableServicesPage extends StatelessWidget {
       serviceName: 'Nail Procedures',
       imagePath: 'lib/images/57.png',
       description:
-          'Finally have the confidence to flaunt heathy, painless, normal, & beautiful nails by fixing them with Nail Procedures in Manila.',
+          'Finally have the confidence to flaunt healthy, painless, normal, & beautiful nails by fixing them with Nail Procedures in Manila.',
     ),
     Services(
       serviceName: 'Immunotherapy',
@@ -302,6 +375,7 @@ class _AvailableServicesPage extends StatelessWidget {
           'Eliminate unsightly varicose & spider veins in a few days with non-surgical vein reduction in Manila.',
     ),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Container(

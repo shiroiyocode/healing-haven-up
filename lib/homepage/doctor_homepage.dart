@@ -9,10 +9,24 @@ class DoctorHomePage extends StatefulWidget {
 }
 
 class _DoctorHomePageState extends State<DoctorHomePage> {
+  // List of pending consultations
+  List<Map<String, String>> pendingConsultations = [
+    {
+      'name': 'Kenneth Reyes',
+      'time': 'April 20, 2025 - 10:00 AM',
+      'reason': 'No Sleep',
+    },
+    {
+      'name': 'Asa',
+      'time': 'April 20, 2025 - 10:00 AM',
+      'reason': 'Just feel like it',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
-    //Dialog for accepting or cancel
-    void Accept(BuildContext context) {
+    // Dialog for accepting a consultation
+    void Accept(BuildContext context, int index) {
       showDialog(
         context: context,
         builder:
@@ -25,23 +39,27 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                 size: 100,
               ),
               actions: [
-                // Cancel button
+                // Done button
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // Close the dialog
+                    setState(() {
+                      // Remove the consultation from the list
+                      pendingConsultations.removeAt(index);
+                    });
                   },
                   child: Text(
                     'Done',
                     style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                 ),
-                // Proceed button
               ],
             ),
       );
     }
 
-    void Cancel(BuildContext context) {
+    // Dialog for canceling a consultation
+    void Cancel(BuildContext context, int index) {
       showDialog(
         context: context,
         builder:
@@ -54,14 +72,14 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                 size: 100,
               ),
               actions: [
-                // Cancel button
+                // Back button
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // Close the dialog
                   },
                   child: Text('Back', style: TextStyle(color: Colors.grey)),
                 ),
-                // Reason input button
+                // Notify Patient button
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // Close the first dialog
@@ -72,7 +90,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                       builder:
                           (context) => CancelReasonDialog(
                             onSend: (reason) {
-                              // TODO: Handle reason (e.g., send to backend or show confirmation)
+                              // Handle reason (e.g., send to backend or show confirmation)
                               print("Reason for cancellation: $reason");
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -80,6 +98,10 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                                   content: Text("Patient has been notified."),
                                 ),
                               );
+                              setState(() {
+                                // Remove the consultation from the list
+                                pendingConsultations.removeAt(index);
+                              });
                             },
                           ),
                     );
@@ -94,20 +116,6 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
       );
     }
 
-    // Dummy list of pending consultations
-    final List<Map<String, String>> pendingConsultations = [
-      {
-        'name': 'Kenneth Reyes',
-        'time': 'April 20, 2025 - 10:00 AM',
-        'reason': 'No Sleep',
-      },
-      {
-        'name': 'Asa',
-        'time': 'April 20, 2025 - 10:00 AM',
-        'reason': 'Just feel like it',
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
@@ -121,7 +129,6 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
           ),
         ),
       ),
-
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -129,14 +136,9 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.white, // A darker, more chocolatey brown
-                Colors.grey.shade200, // A deeper, earthier brown
+                Colors.white,
+                Colors.grey.shade200,
                 Colors.grey.shade300,
-
-                // Dark brown
-                // Dark brown
-                // Lighter warm brown
-                // Even lighter brown/cream
               ],
             ),
           ),
@@ -206,7 +208,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                                   ),
                                   onPressed: () {
                                     // Handle approve
-                                    Accept(context);
+                                    Accept(context, index);
                                   },
                                   child: Text(
                                     "Approve",
@@ -219,7 +221,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                                     backgroundColor: Colors.red[600],
                                   ),
                                   onPressed: () {
-                                    Cancel(context);
+                                    Cancel(context, index);
                                     // Handle cancel
                                   },
                                   child: Text(

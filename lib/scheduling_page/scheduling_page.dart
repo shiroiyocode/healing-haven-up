@@ -1,380 +1,190 @@
-import "package:flutter/material.dart";
-import 'package:healing_haven/loginsignup page/utils/mybutton.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 class SchedulingPage extends StatefulWidget {
-  const SchedulingPage({super.key});
+  const SchedulingPage({Key? key}) : super(key: key);
 
   @override
   State<SchedulingPage> createState() => _SchedulingPageState();
 }
 
 class _SchedulingPageState extends State<SchedulingPage> {
-  DateTime selectedMonth = DateTime.now();
-  DateTime selectedDate = DateTime.now();
-  String _selectedTime = '';
-
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _descriptionController = TextEditingController();
 
-  List<String> months = List.generate(
-    12,
-    (i) => DateFormat.MMMM().format(DateTime(0, i + 1)),
-  );
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
 
-  List<String> availableTimes = [
-    '10:00 AM',
-    '10:30 AM',
-    '11:00 AM',
-    '11:30 AM',
-    '12:00 PM',
-    '12:30 PM',
-    '1:30 PM',
-    '2:00 PM',
-    '2:30 PM',
-    '3:00 PM',
-    '3:30 PM',
-    '4:00 PM',
-    '4:30 PM',
-    '5:00 PM',
-    '5:30 PM',
-    '6:00 PM',
-    '6:30 PM',
-    '7:00 PM',
-  ];
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
-  List<DateTime> getDaysInMonth(DateTime month) {
-    final firstDay = DateTime(month.year, month.month, 1);
-    final lastDay = DateTime(month.year, month.month + 1, 0);
-    return List.generate(
-      lastDay.day,
-      (i) => DateTime(month.year, month.month, i + 1),
-    );
-  }
-
-  void _handleTimeSelected(String selectedTime) {
-    setState(() {
-      _selectedTime = selectedTime;
-    });
-  }
-
-  void areyouSure(BuildContext context) {
-    showDialog(
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.grey.shade200,
-            title: Text(
-              'Confirmation',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            content: Text(
-              'Are you sure about the details you want to proceed with the consultation?',
-              style: TextStyle(fontSize: 16),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Cancel', style: TextStyle(color: Colors.grey)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/waitingpage');
-                },
-                child: Text(
-                  'Proceed',
-                  style: TextStyle(color: Colors.brown.shade800),
-                ),
-              ),
-            ],
-          ),
+      initialDate: now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 1),
     );
+    if (date != null) {
+      setState(() {
+        _selectedDate = date;
+      });
+    }
+  }
+
+  Future<void> _pickTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (time != null) {
+      setState(() {
+        _selectedTime = time;
+      });
+    }
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedDate == null || _selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select date and time')),
+      );
+      return;
+    }
+
+    final dateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    // Format the date nicely (e.g., April 21, 2025 2:30 PM)
+    final formattedDate =
+        "${_monthName(dateTime.month)} ${dateTime.day}, ${dateTime.year} ${_formatTimeOfDay(_selectedTime!)}";
+
+    final newConsultation = {
+      'title': 'Consultation for ${_nameController.text}',
+      'date': formattedDate,
+      'status': 'Pending', // New appointments start pending
+      'name': _nameController.text,
+      'age': int.parse(_ageController.text),
+      'reason': _reasonController.text,
+    };
+
+    // Return new consultation data to previous screen
+    Navigator.pop(context, newConsultation);
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute $period';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
+    _reasonController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final days = getDaysInMonth(selectedMonth);
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
-        title: Text("Book an Appointment"),
-        backgroundColor: Colors.grey.shade200,
+        title: const Text('Schedule Appointment'),
+        backgroundColor: Colors.brown.shade800,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.grey.shade100),
-                  height: 160,
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          right: 16,
-                          bottom: 16,
-                        ),
-                        child: DropdownButton<String>(
-                          value: DateFormat.MMMM().format(selectedMonth),
-                          onChanged: (String? newValue) {
-                            int monthIndex = months.indexOf(newValue!) + 1;
-                            setState(() {
-                              selectedMonth = DateTime(
-                                selectedMonth.year,
-                                monthIndex,
-                                1,
-                              );
-                              selectedDate = DateTime(
-                                selectedMonth.year,
-                                monthIndex,
-                                1,
-                              );
-                            });
-                          },
-                          items:
-                              months.map((String month) {
-                                return DropdownMenuItem<String>(
-                                  value: month,
-                                  child: Text(
-                                    month,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown.shade800,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ),
-                      Container(
-                        height: 80,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: Center(child: Icon(Icons.arrow_back_ios)),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: days.length,
-                                itemBuilder: (context, index) {
-                                  final day = days[index];
-                                  bool isSelected =
-                                      day.day == selectedDate.day &&
-                                      day.month == selectedDate.month;
-                                  return GestureDetector(
-                                    onTap:
-                                        () =>
-                                            setState(() => selectedDate = day),
-                                    child: Container(
-                                      width: 60,
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isSelected
-                                                ? Colors.brown.shade800
-                                                : Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        '${day.day}\n${DateFormat.E().format(day).toUpperCase()}',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color:
-                                              isSelected
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 5.0),
-                              child: Center(
-                                child: Icon(Icons.arrow_forward_ios),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Patient Name'),
+                validator:
+                    (value) =>
+                        (value == null || value.isEmpty)
+                            ? 'Enter a name'
+                            : null,
               ),
-              SizedBox(height: 10),
-              Text("Available Times"),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children:
-                      availableTimes.map((time) {
-                        bool isSelected = _selectedTime == time;
-                        return GestureDetector(
-                          onTap: () => _handleTimeSelected(time),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 3 - 16,
-                            padding: EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color:
-                                  isSelected
-                                      ? Colors.brown.shade800
-                                      : Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              time,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _ageController,
+                decoration: const InputDecoration(labelText: 'Age'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Enter age';
+                  final age = int.tryParse(value);
+                  if (age == null || age <= 0) return 'Enter a valid age';
+                  return null;
+                },
               ),
-
-              // Patient Details Form with Validation
-              Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Patient Details',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown.shade800,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-
-                      // Full Name
-                      TextFormField(
-                        controller: _fullNameController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Full Name is required.';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Full Name',
-                          hintText: 'John Doe',
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.brown.shade800,
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                        ),
-                      ),
-                      SizedBox(height: 12),
-
-                      // Age
-                      TextFormField(
-                        controller: _ageController,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Age is required.';
-                          }
-                          final age = int.tryParse(value);
-                          if (age == null || age <= 0 || age > 120) {
-                            return 'Please enter a valid age.';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Age',
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.brown.shade800,
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                        ),
-                      ),
-                      SizedBox(height: 12),
-
-                      // Description
-                      TextFormField(
-                        controller: _descriptionController,
-                        maxLines: 6,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please describe your problem.';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Describe your problem',
-                          alignLabelWithHint: true,
-                          border: OutlineInputBorder(),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.brown.shade800,
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                        ),
-                      ),
-                    ],
-                  ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _reasonController,
+                decoration: const InputDecoration(
+                  labelText: 'Reason for Visit',
                 ),
+                maxLines: 2,
+                validator:
+                    (value) =>
+                        (value == null || value.isEmpty)
+                            ? 'Enter a reason'
+                            : null,
               ),
-
-              Padding(
-                padding: const EdgeInsets.only(bottom: 25.0),
-                child: Mybutton(
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      areyouSure(context);
-                    }
-                  },
-                  buttonTxt: "Proceed",
-                  color: Colors.brown.shade800,
-                  splashcolor: Colors.brown.shade800,
-                  txtColor: Colors.white,
+              const SizedBox(height: 20),
+              ListTile(
+                title: Text(
+                  _selectedDate == null
+                      ? 'Pick a date'
+                      : "Date: ${_monthName(_selectedDate!.month)} ${_selectedDate!.day}, ${_selectedDate!.year}",
                 ),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: _pickDate,
+              ),
+              ListTile(
+                title: Text(
+                  _selectedTime == null
+                      ? 'Pick a time'
+                      : "Time: ${_formatTimeOfDay(_selectedTime!)}",
+                ),
+                trailing: const Icon(Icons.access_time),
+                onTap: _pickTime,
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown.shade800,
+                ),
+                child: const Text('Schedule Appointment'),
               ),
             ],
           ),
